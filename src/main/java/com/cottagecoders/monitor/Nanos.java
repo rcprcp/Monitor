@@ -1,13 +1,17 @@
 package com.cottagecoders.monitor;
 
-public class Nanos {
+class Nanos {
   long time;
 
   private Nanos() {
     //can't instantiate this.
   }
 
-  public Nanos(long time) {
+  Nanos(long time) {
     this.time = time;
+  }
+
+  long getNanos() {
+    return time;
   }
 }

@@ -5,6 +5,9 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.LoaderClassPath;
+import javassist.Modifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.lang.instrument.ClassFileTransformer;
@@ -13,7 +16,7 @@ import java.security.ProtectionDomain;
 
 //this class will be registered with instrumentation agent
 public class Transformer implements ClassFileTransformer {
-  //  static final Logger logger = LoggerFactory.getLogger(Transformer.class);
+  static final Logger logger = LoggerFactory.getLogger(Transformer.class);
 
   /**
    * @param loader
@@ -34,32 +37,42 @@ public class Transformer implements ClassFileTransformer {
 
     try {
       ClassPool classPool = ClassPool.getDefault();
-      classPool.insertClassPath(className);
-
       classPool.insertClassPath(new LoaderClassPath(loader));
 
       CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
       CtMethod[] methods = ctClass.getDeclaredMethods();
       for (CtMethod method : methods) {
         try {
-          method.addLocalVariable("startTime", CtClass.longType);
-          String code;
+
+          // TODO: is there a problem with Abstract Classes?
+          if(Modifier.isAbstract(method.getModifiers())) {
+            System.out.println("abstract class " + method.getLongName());
+            return byteCode;
+          }
+
+          // TODO: include/exclude methods here?
+          if(!method.getLongName().toLowerCase().contains("bobrun")) {
+            continue;
+          }
+
+          method.addLocalVariable("cottagecoders_monitor_start", CtClass.longType);
+          String code = "{";
           if (Monitor.conf.getPropertyBoolean("whereAmI")) {
-            code = whereAmI(method.getLongName());
-            method.insertBefore(code);
+            code += whereAmI(method.getLongName());
           }
+          code += " cottagecoders_monitor_start = System.nanoTime(); }" ;
+          method.insertBefore(code);
 
-          if (method.getName().toLowerCase().contains("main") || method.getName()
-              .equals("java.lang.String") || method.getName().equals("run1") || method.getName().equals("run2")) {
-            //            String code = before(method.getName());
-            //            method.insertBefore(code);
+          code = after(method.getLongName());
+          method.insertAfter(code);
 
-            //            code = after(method.getName());
-            //            method.insertAfter(code);
-          }
+          // initialize it and add to the Set.
+          MethodMetrics met = new MethodMetrics(method.getLongName());
+          MetricPool.instance().add(met);
 
         } catch (CannotCompileException ex) {
-          System.out.println("Exception " + ex.getReason() + "  " + ex.getStackTrace());
+          System.out.println("Exception: " + ex.getReason());
+          ex.printStackTrace();
         }
       }
 
@@ -74,27 +87,18 @@ public class Transformer implements ClassFileTransformer {
     return byteCode;
   }
 
-  String before(String name) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("{com.cottagecoders.monitor.TimerPool.start(\"");
-    sb.append(name);
-    sb.append("\");}");
-    return sb.toString();
-  }
-
   String whereAmI(String name) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("{System.out.println(\"bobp: got here: ");
-    sb.append(name);
-    sb.append("\");}");
-    return sb.toString();
+    return "System.out.println(\"whereAmI: got here: " + name + "\");";
   }
 
   String after(String name) {
+
     StringBuilder sb = new StringBuilder();
-    sb.append("{com.cottagecoders.monitor.TimerPool.duration(\"");
+    sb.append("{ com.cottagecoders.monitor.MethodMetrics met = new com.cottagecoders.monitor.MethodMetrics(\"");
     sb.append(name);
-    sb.append("\");}");
+    sb.append("\"); ");
+    sb.append("com.cottagecoders.monitor.MetricPool.instance().add(met); }");
+    System.out.println(sb.toString());
     return sb.toString();
   }
 }
