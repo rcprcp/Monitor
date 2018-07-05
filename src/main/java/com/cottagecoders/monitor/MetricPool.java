@@ -3,7 +3,7 @@ package com.cottagecoders.monitor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-final class MetricPool {
+public final class MetricPool {
   private static MetricPool metricPool = new MetricPool();
   private Map<String, MethodMetrics> theMetrics = new ConcurrentHashMap<>();
 
@@ -11,24 +11,28 @@ final class MetricPool {
     // can't instantiate.
   }
 
-  static MetricPool instance() {
+  public static MetricPool instance() {
     return metricPool;
   }
 
-  void add(final MethodMetrics metric) {
-    if (theMetrics.containsKey(metric.getMethodName())) {
-      System.out.println("MetricPool(): add got here for " + metric.getMethodName());
-      System.out.println("MetricPool(): size " + theMetrics.size());
-      for (Map.Entry<String, MethodMetrics> ent : theMetrics.entrySet()) {
-        System.out.println("Method Metrics: " + ent.getKey() + " " + ent.getValue()
-            .getMethodName() + "  " + ent.getValue().getCreateTime() + " " + ent.getValue().getNumHits());
-      }
-      MethodMetrics m = theMetrics.get(metric.getMethodName());
+  public void add(String name, long elapsed) {
+    if (theMetrics.containsKey(name)) {
+      System.out.println("MetricPool(): adding " + name + " pool size " + theMetrics.size());
+      debugPrint();
+      MethodMetrics m = theMetrics.get(name);
+      m.addElapsedNanos(elapsed);
       m.incrementNumHits();
-      theMetrics.put(metric.getMethodName(), m);
-      metric.incrementNumHits();
+      theMetrics.put(name, m);
     } else {
-      theMetrics.put(metric.getMethodName(), metric);
+      MethodMetrics metric = new MethodMetrics(name, elapsed);
+      theMetrics.put(name, metric);
+    }
+  }
+
+  private void debugPrint() {
+    for (Map.Entry<String, MethodMetrics> ent : theMetrics.entrySet()) {
+      System.out.println("Method Metrics: " + ent.getKey() + " " + ent.getValue()
+          .getMethodName() + " nanos: " + ent.getValue().getElapsedNanos().getNanos() + " hits: " + ent.getValue().getNumHits());
     }
   }
 }

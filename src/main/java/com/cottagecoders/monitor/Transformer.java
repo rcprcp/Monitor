@@ -66,9 +66,8 @@ public class Transformer implements ClassFileTransformer {
           code = after(method.getLongName());
           method.insertAfter(code);
 
-          // initialize it and add to the Set.
-          MethodMetrics met = new MethodMetrics(method.getLongName());
-          MetricPool.instance().add(met);
+          // initialize it and add to the data store (a Map, for now).
+          MetricPool.instance().add(method.getLongName(), 0L);
 
         } catch (CannotCompileException ex) {
           System.out.println("Exception: " + ex.getReason());
@@ -88,17 +87,15 @@ public class Transformer implements ClassFileTransformer {
   }
 
   String whereAmI(String name) {
-    return "System.out.println(\"whereAmI: got here: " + name + "\");";
+    return "System.out.println(\"whereAmI?  got here: " + name + "\");";
   }
 
   String after(String name) {
-
     StringBuilder sb = new StringBuilder();
-    sb.append("{ com.cottagecoders.monitor.MethodMetrics met = new com.cottagecoders.monitor.MethodMetrics(\"");
+    sb.append("{ ") ;
+    sb.append("com.cottagecoders.monitor.MetricPool.instance().add(\"");
     sb.append(name);
-    sb.append("\"); ");
-    sb.append("com.cottagecoders.monitor.MetricPool.instance().add(met); }");
-    System.out.println(sb.toString());
+    sb.append("\", System.nanoTime() - cottagecoders_monitor_start); }");
     return sb.toString();
   }
 }

@@ -3,14 +3,13 @@ package com.cottagecoders.monitor;
 public class MethodMetrics implements Comparable<MethodMetrics> {
   private String methodName;
   private String attributes;
-  private Nanos createTime;
+  private Nanos elapsedNanos;
   private long numHits;
 
-  public MethodMetrics(String name) {
-    System.out.println("MethodMetrics: " + name);
+  public MethodMetrics(String name, long elapsed) {
     this.methodName = name;
-    createTime = new Nanos(System.nanoTime());
-    numHits = 1;
+    elapsedNanos = new Nanos(elapsed);
+    numHits = 0;
   }
 
   private MethodMetrics() {
@@ -18,7 +17,7 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
   }
 
   public String toString() {
-    return "MethodMetrics " + methodName + " createTime " + createTime.getNanos() + " numHits " + numHits;
+    return "MethodMetrics " + methodName + " elapsedNanos " + elapsedNanos.getNanos() + " numHits " + numHits;
   }
 
   @Override
@@ -40,8 +39,8 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
     return attributes;
   }
 
-  public Nanos getCreateTime() {
-    return createTime;
+  public Nanos getElapsedNanos() {
+    return elapsedNanos;
   }
 
   public long getNumHits() {
@@ -50,5 +49,9 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
 
   public void incrementNumHits() {
     numHits++;
+  }
+
+  public void addElapsedNanos(long elapsed) {
+    elapsedNanos.addNanos(elapsed);
   }
 }

@@ -7,11 +7,18 @@ class Nanos {
     //can't instantiate this.
   }
 
+  /**
+   * wrapper class to reduce confusion between epoch, epochMS and time in nanos.
+   */
   Nanos(long time) {
     this.time = time;
   }
 
   long getNanos() {
     return time;
+  }
+
+  void addNanos(long nanos) {
+    time += nanos;
   }
 }

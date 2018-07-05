@@ -1,7 +1,9 @@
-#**Monitor**
+###**Monitor**
 
 This is a prototype program to instrument a given Java program to find routine duration, call counts,
 and elapsed time per routine. 
+
+Also, we can determine the number of classes in the class loader which invoked the agent code.
 
 This program needs a configuration file.  The configuration file's location is controlled by the
 MONITOR_PROPERTIES environment variable.  The configuration file can have any name.  
@@ -18,5 +20,7 @@ whereAmI|true or false|instrument each routine with a "got here" entry.|
 
 
 ###**Todo**
-plenty of things.
+* plenty of things.
+* JavaDocs
+* instructions. 
 
