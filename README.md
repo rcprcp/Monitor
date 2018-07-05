@@ -15,13 +15,13 @@ The file currently supports:
 
 |key|value|description|
 |---|---|---| 
-whereAmI|true or false|instrument each routine with a "got here" entry.|
-
-
+whereAmI|true or false|instrument each routine with a "got here" entry.
 
 ## **Todo**
 * plenty of things.
 * JavaDocs
 * instructions
 * some form of reporting mechanism (http, log?)
+* currently testing with Victim - try Data Collector.  :)
+
 

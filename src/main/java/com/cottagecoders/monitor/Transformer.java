@@ -51,7 +51,7 @@ public class Transformer implements ClassFileTransformer {
           }
 
           // TODO: include/exclude methods here?
-          if(!method.getLongName().toLowerCase().contains("bobrun")) {
+          if(!method.getLongName().toLowerCase().contains("victim")) {
             continue;
           }
 

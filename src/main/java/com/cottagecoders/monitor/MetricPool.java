@@ -18,11 +18,11 @@ public final class MetricPool {
   public void add(String name, long elapsed) {
     if (theMetrics.containsKey(name)) {
       System.out.println("MetricPool(): adding " + name + " pool size " + theMetrics.size());
-      debugPrint();
       MethodMetrics m = theMetrics.get(name);
       m.addElapsedNanos(elapsed);
       m.incrementNumHits();
       theMetrics.put(name, m);
+      debugPrint();
     } else {
       MethodMetrics metric = new MethodMetrics(name, elapsed);
       theMetrics.put(name, metric);
