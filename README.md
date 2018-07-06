@@ -20,7 +20,7 @@ whereAmI|true or false|instrument each routine with a "got here" entry.
 ## **Installation and Use:** 
 * create a monitor.properties file: `echo "whereAmI=true" >~/monitor.properties` - or false depending on the level of trace desired
 * set the enviroment variable Monitor uses to point to the properties file: `export MONITOR_PROPERTIES=~/monitor.properties`
-* create a directory which will contain Monitor and Victim, for example `cd bobtest`
+* create a directory which will contain Monitor and Victim, for example `mkdir bobtest`
 * `cd` into that directory eg - `cd bobtest`
 * `git clone https://github.com/rcprcp/Monitor.git`
 * `cd Monitor`
@@ -30,8 +30,8 @@ whereAmI|true or false|instrument each routine with a "got here" entry.
 * `cd Victim`
 * `mvn clean package`
 * `cd target`
-* run Victim with Monitor as a Java Agent.  fix up the path names in this command to match your path. 
-* `java -javaagent:/home/bob/IdeaProjects/Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar Victim-1.0-SNAPSHOT-jar-with-dependencies.jar`
+* run Victim from within the target subdirectory specify Monitor as a Java Agent.
+* `java -javaagent:../Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar Victim-1.0-SNAPSHOT-jar-with-dependencies.jar`
 
 
 
