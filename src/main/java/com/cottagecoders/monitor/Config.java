@@ -14,10 +14,10 @@ public class Config {
 
   Properties props;
 
-  private static final String ERROR1 = "failed to get value of $MONITOR_PROPERTIES";
+  private static final String ERROR1 = "failed to get value of fileName";
 
-  public Config() throws IllegalArgumentException, IOException {
-    String fileName = System.getenv("MONITOR_PROPERTIES");
+  public Config(String fileName) throws IllegalArgumentException, IOException {
+
     if(StringUtils.isEmpty(fileName)) {
       LOG.error(ERROR1);
       System.out.println(ERROR1);

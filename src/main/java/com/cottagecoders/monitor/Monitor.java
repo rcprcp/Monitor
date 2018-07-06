@@ -1,5 +1,7 @@
 package com.cottagecoders.monitor;
 
+import org.apache.commons.lang3.StringUtils;
+import org.omg.CORBA.SystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,35 +9,32 @@ import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 
 public class Monitor {
-  static final Logger LOG = LoggerFactory.getLogger(Monitor.class);
-  private static final String ERROR_1 = "Configuration file was not specified.";
-  private static final String ERROR_2 = "`java -javaagent:Monitor.jar=<config file location> -jar <your jar file>'";
-  private static final String ERROR_3 = "Can't load config file '{}'  exception {}";
+  static final String MONITOR_PROPERTIES = "MONITOR_PROPERTIES";
+
+  private static final Logger LOG = LoggerFactory.getLogger(Monitor.class);
+  private static final String ERROR_1 = "Can't load config file '{}'  exception {}";
   public static Config conf;
 
   private static Instrumentation instrumentation;
 
   /**
-   * @param args
+   * @param args any args after the javaagent jar and the =
    * @param inst
    */
   public static void premain(String args, Instrumentation inst) {
-    if (args.isEmpty()) {
-      // these are important enough to send to the log file and the console.
-      System.out.println(ERROR_1);
-      LOG.error(ERROR_1);
-      System.out.println(ERROR_2);
-      LOG.error(ERROR_2);
-      System.exit(2);
-
-    } else {
+    String fileName = System.getenv(MONITOR_PROPERTIES);
+    if(StringUtils.isEmpty(fileName)) {
+      // important enough to go to both console and log.
+      System.out.println("invalid value set for " + MONITOR_PROPERTIES);
+      LOG.error("invalid value set for  {} ", MONITOR_PROPERTIES);
+      System.exit(27);
+    }
       try {
-        conf = new Config();
+        conf = new Config(fileName);
         System.out.println(conf.toString());
       } catch (IOException ex) {
-        LOG.error(ERROR_3, args, ex.getMessage());
+        LOG.error(ERROR_1, System.getenv("MONITOR_PROPERTIES"), ex.getMessage());
       }
-    }
 
     inst.addTransformer(new Transformer());
   }
