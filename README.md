@@ -40,6 +40,6 @@ whereAmI|true or false|instrument each routine with a "got here" entry.
 * JavaDocs
 * more complete instructions
 * some form of reporting mechanism (http, log?)
-* currently testing with Victim - should try Data Collector.  :)
+* currently testing with Victim - should try Data Collector or another interesting program.  :)
 
 
