@@ -31,7 +31,7 @@ whereAmI|true or false|instrument each routine with a "got here" entry.
 * `mvn clean package`
 * `cd target`
 * run Victim from within the target subdirectory specify Monitor as a Java Agent.
-* `java -javaagent:../Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar Victim-1.0-SNAPSHOT-jar-with-dependencies.jar`
+* `java -javaagent:../../Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar Victim-1.0-SNAPSHOT-jar-with-dependencies.jar`
 
 
 
