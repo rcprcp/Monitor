@@ -18,7 +18,7 @@ The file currently supports:
 whereAmI|true or false|instrument each routine with a "got here" entry.
 
 ## **Installation and Use:** 
-* create a monitor.properties file: `echo whereAmI=true >~/monitor.properties` - or false depending on the level of trace desired
+* create a monitor.properties file: `echo "whereAmI=true" >~/monitor.properties` - or false depending on the level of trace desired
 * set the enviroment variable Monitor uses to point to the properties file: `export MONITOR_PROPERTIES=~/monitor.properties`
 * create a directory which will contain Monitor and Victim, for example `cd bobtest`
 * `cd` into that directory eg - `cd bobtest`
