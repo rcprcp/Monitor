@@ -23,7 +23,11 @@ includeList=com/cottagecoders/victim/Vi.\*,com/streamsets.\*
 . is any character, * for 0 to any number of characters.
 
 ## **Installation and Use:** 
-* create a monitor.properties file: `echo "whereAmI=true" >~/monitor.properties` - or false depending on the level of trace desired
+* create a monitor.properties file with the following lines:
+```
+whereAmi=true
+includeList=com/cottagecoders/victim/Vi.*,com/streamsets.*
+```
 * set the enviroment variable Monitor uses to point to the properties file: `export MONITOR_PROPERTIES=~/monitor.properties`
 * create a directory which will contain Monitor and Victim, for example `mkdir bobtest`
 * `cd` into that directory eg - `cd bobtest`
