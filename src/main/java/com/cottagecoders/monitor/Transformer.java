@@ -10,13 +10,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 
 //this class will be registered with instrumentation agent
 public class Transformer implements ClassFileTransformer {
-  static final Logger logger = LoggerFactory.getLogger(Transformer.class);
+  static final Logger LOG = LoggerFactory.getLogger(Transformer.class);
+
+  private static final String[] classesToInstrument = Monitor.conf.getAsArray("includeList");
+
+  private static List<Pattern> patterns = new ArrayList<>();
+
+  /**
+   * initialize the transformer code, particularly the regex processing.
+   */
+  public void init() {
+    // nothing specified in include list.
+    if (classesToInstrument.length == 0) {
+      LOG.error("No Classes specified in the config file");
+    }
+
+    for (String cl : classesToInstrument) {
+      Pattern pattern = Pattern.compile(cl);
+      patterns.add(pattern);
+    }
+  }
 
   /**
    * @param loader
@@ -35,54 +58,60 @@ public class Transformer implements ClassFileTransformer {
   ) {
     byte[] byteCode = classfileBuffer;
 
-    try {
-      ClassPool classPool = ClassPool.getDefault();
-      classPool.insertClassPath(new LoaderClassPath(loader));
+    ClassPool classPool = ClassPool.getDefault();
+    classPool.insertClassPath(new LoaderClassPath(loader));
 
-      CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-      CtMethod[] methods = ctClass.getDeclaredMethods();
-      for (CtMethod method : methods) {
-        try {
+    CtClass ctClass;
+    try {
+      ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
+    } catch (IOException ex) {
+      LOG.error("Exception reading ByteArrayInputStream '{}' ", ex.getMessage(), ex);
+      return byteCode;
+    }
+
+    // check if this is a class we should instrument...
+    for (Pattern p : patterns) {
+      if (p.matcher(className).matches()) {
+
+        CtMethod[] methods = ctClass.getDeclaredMethods();
+        for (CtMethod method : methods) {
 
           // TODO: is there a problem with Abstract Classes?
-          if(Modifier.isAbstract(method.getModifiers())) {
+          if (Modifier.isAbstract(method.getModifiers())) {
             System.out.println("abstract class " + method.getLongName());
             return byteCode;
           }
 
-          // TODO: include/exclude methods here?
-          if(!method.getLongName().toLowerCase().contains("com.cottagecoders.victim")) {
-            continue;
+          try {
+            method.addLocalVariable("cottagecoders_monitor_start", CtClass.longType);
+            String code = "{";
+            if (Monitor.conf.getAsBoolean("whereAmI")) {
+              code += whereAmI(method.getLongName());
+            }
+            code += " cottagecoders_monitor_start = System.nanoTime(); }";
+            method.insertBefore(code);
+
+            code = after(method.getLongName());
+            method.insertAfter(code);
+
+            // initialize it and add to the data store (a Map, for now).
+            MetricPool.instance().add(method.getLongName(), 0L);
+
+          } catch (CannotCompileException ex) {
+            LOG.error("Exception: '{}'", ex.getMessage(), ex);
           }
-
-          method.addLocalVariable("cottagecoders_monitor_start", CtClass.longType);
-          String code = "{";
-          if (Monitor.conf.getPropertyBoolean("whereAmI")) {
-            code += whereAmI(method.getLongName());
-          }
-          code += " cottagecoders_monitor_start = System.nanoTime(); }" ;
-          method.insertBefore(code);
-
-          code = after(method.getLongName());
-          method.insertAfter(code);
-
-          // initialize it and add to the data store (a Map, for now).
-          MetricPool.instance().add(method.getLongName(), 0L);
-
-        } catch (CannotCompileException ex) {
-          System.out.println("Exception: " + ex.getReason());
-          ex.printStackTrace();
         }
+
+        try {
+          byteCode = ctClass.toBytecode();
+        } catch (IOException | CannotCompileException ex) {
+          LOG.error("Exception: '{}'", ex.getMessage(), ex);
+        }
+        ctClass.detach();
+        // break inner for loop - classname matched - dont check any more.
+        break;
       }
-
-      byteCode = ctClass.toBytecode();
-      ctClass.detach();
-
-    } catch (Throwable ex) {
-      System.out.println("Exception: " + ex);
-      ex.printStackTrace();
     }
-
     return byteCode;
   }
 
@@ -92,7 +121,7 @@ public class Transformer implements ClassFileTransformer {
 
   String after(String name) {
     StringBuilder sb = new StringBuilder();
-    sb.append("{ ") ;
+    sb.append("{ ");
     sb.append("com.cottagecoders.monitor.MetricPool.instance().add(\"");
     sb.append(name);
     sb.append("\", System.nanoTime() - cottagecoders_monitor_start); }");

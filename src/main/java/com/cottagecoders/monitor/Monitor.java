@@ -35,8 +35,10 @@ public class Monitor {
       } catch (IOException ex) {
         LOG.error(ERROR_1, System.getenv("MONITOR_PROPERTIES"), ex.getMessage());
       }
+      Transformer transformer = new Transformer();
+    transformer.init();
 
-    inst.addTransformer(new Transformer());
+    inst.addTransformer(transformer);
   }
 
   /**

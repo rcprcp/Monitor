@@ -14,6 +14,8 @@ public class Config {
 
   Properties props;
 
+  private static final String [] emptyArr = new String[0];
+
   private static final String ERROR1 = "failed to get value of fileName";
 
   public Config(String fileName) throws IllegalArgumentException, IOException {
@@ -34,15 +36,23 @@ public class Config {
     }
   }
 
-  public String getPropertyString(String propName) {
+  public String getString(String propName) {
     if (StringUtils.isEmpty(props.getProperty(propName))) {
       return "";
     }
     return props.getProperty(propName);
   }
 
-  public boolean getPropertyBoolean(String propName) {
-    if (getPropertyString(propName).equalsIgnoreCase("true")) {
+  public String [] getAsArray(String propName) {
+    if (StringUtils.isEmpty(props.getProperty(propName))) {
+      return emptyArr;
+    }
+    String [] parts = props.getProperty(propName).split(",");
+    return parts;
+  }
+
+  public boolean getAsBoolean(String propName) {
+    if (getString(propName).equalsIgnoreCase("true")) {
       return true;
     }
     return false;
