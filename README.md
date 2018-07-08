@@ -8,14 +8,19 @@ Also, we can probably determine the number of classes in the class loader which 
 This program needs a configuration file.  The configuration file's location is controlled by the
 MONITOR_PROPERTIES environment variable.  The configuration file can have any name.  
 
-The format of the configuration file is "key=value", as it is parsed and 
-turned into a Java Properties object. 
+The format of the configuration file is "key=value"; it is parsed into a Java Properties object. 
 
 The file currently supports:
 
 |key|value|description|
 |---|---|---| 
+includeList|String| list of comma separated regexes to select classes to instrument. 
 whereAmI|true or false|instrument each routine with a "got here" entry.
+
+### **includeList example:**
+includeList=com/cottagecoders/victim/Vi.\*,com/streamsets.\*
+
+. is any character, * for 0 to any number of characters.
 
 ## **Installation and Use:** 
 * create a monitor.properties file: `echo "whereAmI=true" >~/monitor.properties` - or false depending on the level of trace desired
