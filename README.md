@@ -16,7 +16,7 @@ The file currently supports:
 |---|---|---| 
 includeList|String| list of comma separated regexes to select classes to instrument. 
 whereAmI|true or false|instrument each routine with a "got here" entry.
-
+httpPort| integer between 1025 and 65535|specify the port for the http server. 1128 is the default.
 ### **includeList example:**
 includeList=com/cottagecoders/victim/Vi.\*,com/streamsets.\*
 
@@ -27,6 +27,7 @@ includeList=com/cottagecoders/victim/Vi.\*,com/streamsets.\*
 ```
 whereAmi=true
 includeList=com/cottagecoders/victim/Vi.*,com/streamsets.*
+httpPort=22277
 ```
 * set the enviroment variable Monitor uses to point to the properties file: `export MONITOR_PROPERTIES=~/monitor.properties`
 * create a directory which will contain Monitor and Victim, for example `mkdir bobtest`
@@ -49,6 +50,7 @@ includeList=com/cottagecoders/victim/Vi.*,com/streamsets.*
 * JavaDocs
 * more complete instructions
 * some form of reporting mechanism (http, log?)
+* Object creation code and heap space monitoring code. 
 * currently testing with Victim - should try Data Collector or another interesting program.  :)
 
 
