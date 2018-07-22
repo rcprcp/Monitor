@@ -22,17 +22,25 @@ public final class MetricPool {
       m.addElapsedNanos(elapsed);
       m.incrementNumHits();
       theMetrics.put(name, m);
-      debugPrint();
     } else {
       MethodMetrics metric = new MethodMetrics(name, elapsed);
+      //TODO: remove debug code.
+      System.out.println(metric.toString());
       theMetrics.put(name, metric);
     }
   }
 
-  private void debugPrint() {
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
     for (Map.Entry<String, MethodMetrics> ent : theMetrics.entrySet()) {
-      System.out.println("Method Metrics: " + ent.getKey() + " " + ent.getValue()
-          .getMethodName() + " nanos: " + ent.getValue().getElapsedNanos().getNanos() + " hits: " + ent.getValue().getNumHits());
+      sb.append(ent.getValue().toString());
+      sb.append("\n");
     }
+    return sb.toString();
   }
+
+  public static String dump() {
+    return metricPool.toString();
+  }
+
 }

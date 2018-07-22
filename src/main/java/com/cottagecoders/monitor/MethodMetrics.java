@@ -1,15 +1,22 @@
 package com.cottagecoders.monitor;
 
+import java.util.UUID;
+
 public class MethodMetrics implements Comparable<MethodMetrics> {
   private String methodName;
   private String attributes;
   private Nanos elapsedNanos;
   private long numHits;
+  private UUID uuid;
+  private ClassCounter classCounter;
 
   public MethodMetrics(String name, long elapsed) {
     this.methodName = name;
     elapsedNanos = new Nanos(elapsed);
     numHits = 0;
+    classCounter = new ClassCounter();
+    classCounter.updateClassCounts();
+    uuid = UUID.randomUUID();
   }
 
   private MethodMetrics() {
@@ -17,7 +24,25 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
   }
 
   public String toString() {
-    return "MethodMetrics " + methodName + " elapsedNanos " + elapsedNanos.getNanos() + " numHits " + numHits;
+    StringBuilder sb = new StringBuilder();
+    sb.append("MethodMetrics: ");
+
+    sb.append(" methodName: ");
+    sb.append(methodName);
+
+    sb.append(" elapsedNanos ");
+    sb.append(elapsedNanos.getNanos());
+
+    sb.append(" numHits: " );
+    sb.append(numHits);
+
+    sb.append(" classCounter Info: ");
+    sb.append(classCounter.toString());
+
+    sb.append(" UUID: ");
+    sb.append(uuid);
+
+    return sb.toString();
   }
 
   @Override
@@ -46,6 +71,8 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
   public long getNumHits() {
     return numHits;
   }
+
+  public UUID getUUID() { return uuid;}
 
   public void incrementNumHits() {
     numHits++;

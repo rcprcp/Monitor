@@ -31,11 +31,20 @@ public class HttpServer extends NanoHTTPD implements Runnable {
     StringBuilder sb = new StringBuilder(header);
     if (parms.get("page") == null) {
       // menu.
-      sb.append("<a href=http://localhost:");
+      sb.append("<br><a href=http://localhost:");
       sb.append(port);
-      sb.append("?page=stats>Statistics</a>");
-    } else if (parms.get("page").equalsIgnoreCase("stats")) {
+      sb.append("?page=config>Config</a></br>");
+
+      sb.append("<br><a href=http://localhost:");
+      sb.append(port);
+      sb.append("?page=metrics>Metrics</a></br>");
+
+    } else if (parms.get("page").equalsIgnoreCase("config")) {
       sb.append(Monitor.conf.toHtml());
+
+    } else if (parms.get("page").equalsIgnoreCase("metrics")) {
+      sb.append(MetricPool.dump().replaceAll("\n", "<br>"));
+
     }
     sb.append(footer);
 
