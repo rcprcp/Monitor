@@ -56,9 +56,16 @@ plenty of things.
 - [ ] More complete instructions
 - [ ] Some form of logging mechanism (file, log4j)
 - [ ] Seems to crash with some classes in WebGoat.
+- [ ] JUnit tests for some of the classes.
+- [ ] Integration tests for some classes.
+- [x] Configuration file.
+- [x] Gather info about number of loaded classes.
+- [ ] read the fine print before enabling Travis-CI.
 - [ ] Object creation code and heap space monitoring code.
 - [x] Collect information on number of classes loaded.
-- [ ] add some CSS to the html.   :smile: 
+- [ ] Add some CSS to the html.   :smile: 
+- [ ] More HTML pages - for additional metrics.
+- [ ] Can we use a templating engine wfor out HTML?
 - [ ] Add sort(s) the the Metrics table (name, elapsed time, hits)
 - [ ] Need to identify how to walk the heap to find and "bucketize" objects for counting and size monitoring. 
 - [ ] Need to intercept inbound and outbound socket data.  
