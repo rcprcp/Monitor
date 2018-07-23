@@ -1,11 +1,12 @@
 # **Monitor**
 
 This is a prototype program to instrument a given Java program to find call counts
-and elapsed time per routine. 
+and elapsed time per routine.  It needs to be expanded to track objects in the heap and inbound and outbound socket communication.
 
-Also, we can probably determine the number of classes in the class loader which invoked the agent code.
+We can probably determine the number of classes in the class loader which invoked the agent code.
+This is implemented - it's available in a JMX MBean.
 
-This program needs a configuration file.  The configuration file's location is controlled by the
+This program uses a configuration file.  The configuration file's location is controlled by the
 MONITOR_PROPERTIES environment variable.  The configuration file can have any name.  
 
 The format of the configuration file is "key=value"; it is parsed into a Java Properties object. 
@@ -20,7 +21,7 @@ httpPort| integer between 1025 and 65535|specify the port for the http server. 1
 ### **includeList example:**
 includeList=com/cottagecoders/victim/Vi.\*,com/streamsets.\*
 
-. is any character, * for 0 to any number of characters.
+. represents any character, * for 0 to any number of characters.
 
 ## **Installation and Use:** 
 * create a monitor.properties file with the following lines:
@@ -29,8 +30,8 @@ whereAmi=true
 includeList=com/cottagecoders/victim/Vi.*,com/streamsets.*
 httpPort=22277
 ```
-* set the environment variable Monitor uses to point to the properties file: `export MONITOR_PROPERTIES=~/monitor.properties`
-* create a directory which will contain Monitor and Victim, for example `mkdir bobtest`
+* Set the environment variable Monitor uses to point to the properties file: `export MONITOR_PROPERTIES=~/monitor.properties`
+* Create a directory which will contain Monitor and Victim, for example `mkdir bobtest`
 * `cd` into that directory eg - `cd bobtest`
 * `git clone https://github.com/rcprcp/Monitor.git`
 * `cd Monitor`
@@ -42,20 +43,24 @@ httpPort=22277
 * `cd target`
 * run Victim from within the target subdirectory specify Monitor as a Java Agent.
 * `java -javaagent:../../Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar Victim-1.0-SNAPSHOT-jar-with-dependencies.jar`
+
+To run the program with Webgoat - follow the above steps then... 
+* `cd bobtest`
+* download Webgoat - i downloaded the jar from here: [https://github.com/WebGoat/WebGoat/releases]  you may have to copy it over from Downloads directory to the bobtest directory.
 * run WebGoat and redirect output to review later:
-* `java -javaagent:/home/bob/IdeaProjects/Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar webgoat-server-8.0.0.M21.jar >x 2>x`
-
-
-
+* When WebGoat is in this directory run `java -javaagent:./Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar webgoat-server-8.0.0.M21.jar >x 2>x`
+* nb.  I redirect stdout, stderr to 'x' review them later. 
 ## **Todo**
-* plenty of things.
-* JavaDocs
-* more complete instructions
-* some form of logging mechanism (file, log4j)
-* Object creation code and heap space monitoring code.
-* Loaded Classes seems ok. 
-* Add sort(s) the the Metrics table (name, elapsed time, hits)
-* need to identify how to walk the heap to find and "bucketize" objects for counting and size monitoring. 
-* need to intercept inbound and outbound socket data.  
-* currently testing with Victim - and WebGoat - should try Data Collector
+plenty of things.
+- [ ] JavaDocs
+- [ ] More complete instructions
+- [ ] Some form of logging mechanism (file, log4j)
+- [ ] Seems to crash with some classes in WebGoat.
+- [ ] Object creation code and heap space monitoring code.
+- [x] Collect information on number of classes loaded.
+- [ ] add some CSS to the html.   :smile: 
+- [ ] Add sort(s) the the Metrics table (name, elapsed time, hits)
+- [ ] Need to identify how to walk the heap to find and "bucketize" objects for counting and size monitoring. 
+- [ ] Need to intercept inbound and outbound socket data.  
+- [ ] Currently testing with Victim - and WebGoat - should try Data Collector
 
