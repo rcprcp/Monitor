@@ -27,7 +27,7 @@ includeList=com/cottagecoders/victim/Vi.\*,com/streamsets.\*
 * create a monitor.properties file with the following lines:
 ```
 whereAmi=true
-includeList=com/cottagecoders/victim/Vi.*,com/streamsets.*
+includeList=com/cottagecoders/victim/Vi.*,com/streamsets.*,org/owasp/webgoat.*,org/springframework.*
 httpPort=22277
 ```
 * Set the environment variable Monitor uses to point to the properties file: `export MONITOR_PROPERTIES=~/monitor.properties`
