@@ -45,6 +45,29 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
     return sb.toString();
   }
 
+  public String htmlTableRow() {
+    StringBuilder sb = new StringBuilder() ;
+    sb.append("<tr><td>");
+    sb.append(methodName);
+    sb.append("</td>");
+
+    sb.append("<td>");
+    sb.append(elapsedNanos.getNanos());
+    sb.append("</td>");
+
+    sb.append("<td>");
+    sb.append(numHits);
+    sb.append("</td>");
+
+    sb.append(classCounter.htmlTdElements());
+
+    sb.append("<td>");
+    sb.append(uuid);
+    sb.append("</td></tr>");
+
+    return sb.toString();
+  }
+
   @Override
   public int compareTo(MethodMetrics other) {
     if (this.methodName.equals(other.methodName)) {

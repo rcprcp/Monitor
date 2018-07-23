@@ -53,10 +53,8 @@ public class ClassCounter {
           }
         }
       }
-      //TODO: remove debugging code:
-      System.out.println("updateClassCounts(): " + this.toString());
-
     } catch (MBeanException | InstanceNotFoundException | ReflectionException | AttributeNotFoundException ex) {
+      System.out.println("Exception: " + ex.getMessage());
       ex.printStackTrace();
     }
   }
@@ -71,6 +69,24 @@ public class ClassCounter {
 
   public long getUnloadedClassCount() {
     return unloadedClassCount;
+  }
+
+  public String htmlTdElements() {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("<td>");
+    sb.append(totalLoadedClassCount);
+    sb.append("</td>");
+
+    sb.append("<td>");
+    sb.append(loadedClassCount);
+    sb.append("</td>");
+
+    sb.append("<td>");
+    sb.append(unloadedClassCount);
+    sb.append("</td>");
+
+    return sb.toString();
   }
 
   public String toString() {

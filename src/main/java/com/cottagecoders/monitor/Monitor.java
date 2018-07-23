@@ -1,24 +1,16 @@
 package com.cottagecoders.monitor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 
 public class Monitor {
   static final String MONITOR_PROPERTIES = "MONITOR_PROPERTIES";
-
   static final String WHEREAMI = "whereAmI";
   static final String INCLUDE_LIST = "includeList";
   static final String HTTP_PORT = "httpPort";
-
   static final int DEFAULT_PORT = 1128;
-
-
-  private static final Logger LOG = LoggerFactory.getLogger(Monitor.class);
-  private static final String ERROR_1 = "Can't load config file '{}'  exception {}";
   public static Config conf;
 
   private static Instrumentation instrumentation;
@@ -32,15 +24,15 @@ public class Monitor {
     if (StringUtils.isEmpty(fileName)) {
       // important enough to go to both console and log.
       System.out.println("invalid value set for " + MONITOR_PROPERTIES);
-      LOG.error("invalid value set for  {} ", MONITOR_PROPERTIES);
       System.exit(27);
     }
     try {
       conf = new Config(fileName);
-      System.out.println(conf.toString());
     } catch (IOException ex) {
-      LOG.error(ERROR_1, System.getenv("MONITOR_PROPERTIES"), ex.getMessage());
+      System.out.println("Can't load config file " + System.getenv("MONITOR_PROPERTIES") + " message " + ex
+          .getMessage());
     }
+
     Transformer transformer = new Transformer();
     transformer.init();
 

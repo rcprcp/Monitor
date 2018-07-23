@@ -6,8 +6,6 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.LoaderClassPath;
 import javassist.Modifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -20,7 +18,7 @@ import java.util.regex.Pattern;
 
 //this class will be registered with instrumentation agent
 public class Transformer implements ClassFileTransformer {
-  static final Logger LOG = LoggerFactory.getLogger(Transformer.class);
+  //  static final Logger LOG = LoggerFactory.getLogger(Transformer.class);
 
   private static final String[] classesToInstrument = Monitor.conf.getAsArray("includeList");
 
@@ -32,7 +30,7 @@ public class Transformer implements ClassFileTransformer {
   public void init() {
     // nothing specified in include list.
     if (classesToInstrument.length == 0) {
-      LOG.error("No Classes specified in the config file");
+      System.out.println("No Classes specified in the config file");
     }
 
     for (String cl : classesToInstrument) {
@@ -65,7 +63,8 @@ public class Transformer implements ClassFileTransformer {
     try {
       ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
     } catch (IOException ex) {
-      LOG.error("Exception reading ByteArrayInputStream '{}' ", ex.getMessage(), ex);
+      System.out.println("Exception " + ex.getMessage());
+      ex.printStackTrace();
       return byteCode;
     }
 
@@ -78,14 +77,14 @@ public class Transformer implements ClassFileTransformer {
 
           // TODO: is there a problem with Abstract Classes?
           if (Modifier.isAbstract(method.getModifiers())) {
-            System.out.println("abstract class " + method.getLongName());
+//            System.out.println("abstract class " + method.getLongName());
             return byteCode;
           }
 
           try {
             method.addLocalVariable("cottagecoders_monitor_start", CtClass.longType);
             String code = "{";
-            if (Monitor.conf.getAsBoolean("whereAmI")) {
+            if (Monitor.conf.getAsBoolean(Monitor.WHEREAMI)) {
               code += whereAmI(method.getLongName());
             }
             code += " cottagecoders_monitor_start = System.nanoTime(); }";
@@ -98,14 +97,16 @@ public class Transformer implements ClassFileTransformer {
             MetricPool.instance().add(method.getLongName(), 0L);
 
           } catch (CannotCompileException ex) {
-            LOG.error("Exception: '{}'", ex.getMessage(), ex);
+            System.out.println("Exception " + ex.getMessage());
+            ex.printStackTrace();
           }
         }
 
         try {
           byteCode = ctClass.toBytecode();
         } catch (IOException | CannotCompileException ex) {
-          LOG.error("Exception: '{}'", ex.getMessage(), ex);
+          System.out.println("Exception " + ex.getMessage());
+          ex.printStackTrace();
         }
         ctClass.detach();
         // break inner for loop - classname matched - dont check any more.
