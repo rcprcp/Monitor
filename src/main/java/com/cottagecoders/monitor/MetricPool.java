@@ -39,8 +39,9 @@ public final class MetricPool {
 
   public static String htmlTable() {
     StringBuilder sb = new StringBuilder();
-    sb.append("<table border=1><col width=\"%30\"><tr><th>Method Name</th><th>elapsed Nanos</th><th>hits</th>");
-    sb.append("<th>Total Classes</th><th>Loaded Classed</th><th>Unloaded Classes</th><td>UUID</th></tr>");
+    sb.append("<table border=1 style={width: 100%;margin: 30px; border: 30px;}>");
+    sb.append("<tr><th>Method Name</th><th>elapsed Nanos</th><th>Hits</th>");
+    sb.append("<th>Total Classes</th><th>Loaded Classed</th><th>Unloaded Classes</th><th>UUID</th></tr>");
 
     for(Map.Entry<String, MethodMetrics> entry : theMetrics.entrySet()) {
       sb.append(entry.getValue().htmlTableRow());
@@ -48,6 +49,10 @@ public final class MetricPool {
 
     sb.append("</table>");
     return sb.toString();
+  }
+
+  public static int count(){
+    return theMetrics.size();
   }
 
 }

@@ -57,6 +57,7 @@ public class HttpServer extends NanoHTTPD implements Runnable {
       sb.append(Monitor.conf.toHtml());
 
     } else if (parms.get("page").equalsIgnoreCase("metrics")) {
+      sb.append("MetricPool size " + MetricPool.count());
       sb.append(MetricPool.htmlTable().replaceAll("\n", "<br>"));
 
     }

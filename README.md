@@ -29,7 +29,7 @@ whereAmi=true
 includeList=com/cottagecoders/victim/Vi.*,com/streamsets.*
 httpPort=22277
 ```
-* set the enviroment variable Monitor uses to point to the properties file: `export MONITOR_PROPERTIES=~/monitor.properties`
+* set the environment variable Monitor uses to point to the properties file: `export MONITOR_PROPERTIES=~/monitor.properties`
 * create a directory which will contain Monitor and Victim, for example `mkdir bobtest`
 * `cd` into that directory eg - `cd bobtest`
 * `git clone https://github.com/rcprcp/Monitor.git`
@@ -42,6 +42,8 @@ httpPort=22277
 * `cd target`
 * run Victim from within the target subdirectory specify Monitor as a Java Agent.
 * `java -javaagent:../../Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar Victim-1.0-SNAPSHOT-jar-with-dependencies.jar`
+* run WebGoat and redirect output to review later:
+* `java -javaagent:/home/bob/IdeaProjects/Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar webgoat-server-8.0.0.M21.jar >x 2>x`
 
 
 
@@ -49,8 +51,11 @@ httpPort=22277
 * plenty of things.
 * JavaDocs
 * more complete instructions
-* some form of reporting mechanism (http, log?)
-* Object creation code and heap space monitoring code. 
-* currently testing with Victim - should try Data Collector or another interesting program.  :)
-
+* some form of logging mechanism (file, log4j)
+* Object creation code and heap space monitoring code.
+* Loaded Classes seems ok. 
+* Add sort(s) the the Metrics table (name, elapsed time, hits)
+* need to identify how to walk the heap to find and "bucketize" objects for counting and size monitoring. 
+* need to intercept inbound and outbound socket data.  
+* currently testing with Victim - and WebGoat - should try Data Collector
 

@@ -45,10 +45,10 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
     return sb.toString();
   }
 
-  public String htmlTableRow() {
+  String htmlTableRow() {
     StringBuilder sb = new StringBuilder() ;
     sb.append("<tr><td>");
-    sb.append(methodName);
+    sb.append(methodName.replace('.',' '));
     sb.append("</td>");
 
     sb.append("<td>");
