@@ -57,7 +57,7 @@ plenty of things.
 - [ ] Some form of logging mechanism (file, log4j)
 - [ ] Seems to crash when instrumenting some classes in WebGoat.
 - [ ] JUnit tests for some of the classes.
-- [ ] Fix the pom file for packaging.
+- [x] Fix the pom file for packaging.
 - [ ] Integration tests for some classes.
 - [x] Configuration file.
 - [x] Gather info about number of loaded classes.
