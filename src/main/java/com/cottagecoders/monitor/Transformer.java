@@ -66,11 +66,8 @@ public class Transformer implements ClassFileTransformer {
         CtClass ctClass;
         try {
           classPool.insertClassPath(new LoaderClassPath(loader));
-          classPool.insertClassPath(protectionDomain.getClassLoader().toString());
-          classPool.insertClassPath(protectionDomain.getClassLoader().getParent().toString());
-          classPool.importPackage("com.cottagecoders.monitor");
           ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-        } catch (NotFoundException | IOException ex) {
+        } catch (/*NotFoundException | */  IOException ex) {
           System.out.println("Exception " + ex.getMessage());
           ex.printStackTrace();
           return classfileBuffer;
