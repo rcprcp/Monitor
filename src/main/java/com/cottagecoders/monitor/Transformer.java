@@ -58,23 +58,23 @@ public class Transformer implements ClassFileTransformer {
     byte[] byteCode = classfileBuffer;
 
 
-    ClassPool classPool = ClassPool.getDefault();
-    CtClass ctClass;
-    try {
-      classPool.insertClassPath(new LoaderClassPath(loader));
-      classPool.insertClassPath(protectionDomain.getClassLoader().toString());
-      classPool.insertClassPath(protectionDomain.getClassLoader().getParent().toString());
-      classPool.importPackage("com.cottagecoders.monitor");
-      ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-    } catch (NotFoundException | IOException ex) {
-      System.out.println("Exception " + ex.getMessage());
-      ex.printStackTrace();
-      return byteCode;
-    }
-
     // check if this is a class we should instrument...
     for (Pattern p : patterns) {
       if (p.matcher(className).matches()) {
+
+        ClassPool classPool = ClassPool.getDefault();
+        CtClass ctClass;
+        try {
+          classPool.insertClassPath(new LoaderClassPath(loader));
+          classPool.insertClassPath(protectionDomain.getClassLoader().toString());
+          classPool.insertClassPath(protectionDomain.getClassLoader().getParent().toString());
+          classPool.importPackage("com.cottagecoders.monitor");
+          ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
+        } catch (NotFoundException | IOException ex) {
+          System.out.println("Exception " + ex.getMessage());
+          ex.printStackTrace();
+          return byteCode;
+        }
 
         CtMethod[] methods = ctClass.getDeclaredMethods();
         for (CtMethod method : methods) {
@@ -94,8 +94,9 @@ public class Transformer implements ClassFileTransformer {
               code += whereAmI(method.getLongName());
             }
 
-//            System.err.println("class " + className + " method " + method.getLongName() + "mods " + Modifier.toString(
-//                method.getModifiers()));
+            //            System.err.println("class " + className + " method " + method.getLongName() + "mods " +
+            // Modifier.toString(
+            //                method.getModifiers()));
             code += " cottagecoders_monitor_start = System.nanoTime(); }";
             method.insertBefore(code);
 
@@ -103,7 +104,7 @@ public class Transformer implements ClassFileTransformer {
             method.insertAfter(code);
 
             // initialize it and add to the data store (a Map, for now).
-//            MetricPool.instance().add(method.getLongName(), 0L);
+            //            MetricPool.instance().add(method.getLongName(), 0L);
             MetricPool.add(method.getLongName(), 0L);
 
           } catch (CannotCompileException ex) {
@@ -133,7 +134,6 @@ public class Transformer implements ClassFileTransformer {
   String after(String name) {
     StringBuilder sb = new StringBuilder();
     sb.append("{ ");
-//    sb.append("com.cottagecoders.monitor.MetricPool.instance().add(\"");
     sb.append("com.cottagecoders.monitor.MetricPool.add(\"");
     sb.append(name);
     sb.append("\", System.nanoTime() - cottagecoders_monitor_start); }");

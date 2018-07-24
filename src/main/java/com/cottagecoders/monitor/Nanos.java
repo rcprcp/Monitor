@@ -8,7 +8,7 @@ class Nanos {
   }
 
   /**
-   * wrapper class to reduce confusion between epoch, epochMS and time in nanos.
+   * wrapper class to reduce confusion between epoch, epochMS and relative time in nanos.
    */
   Nanos(long time) {
     this.time = time;

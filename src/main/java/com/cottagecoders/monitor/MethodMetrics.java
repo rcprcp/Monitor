@@ -32,7 +32,7 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
     sb.append(" elapsedNanos ");
     sb.append(elapsedNanos.getNanos());
 
-    sb.append(" numHits: " );
+    sb.append(" numHits: ");
     sb.append(numHits);
 
     sb.append(" classCounter Info: ");
@@ -45,9 +45,9 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
   }
 
   String htmlTableRow() {
-    StringBuilder sb = new StringBuilder() ;
+    StringBuilder sb = new StringBuilder();
     sb.append("<tr><td>");
-    sb.append(methodName.replace('.',' '));
+    sb.append(methodName.replace('.', ' '));
     sb.append("</td>");
 
     sb.append("<td>");
@@ -98,7 +98,9 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
     return numHits;
   }
 
-  public UUID getUUID() { return uuid;}
+  public UUID getUUID() {
+    return uuid;
+  }
 
   public void incrementNumHits() {
     numHits++;
