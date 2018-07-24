@@ -73,18 +73,17 @@ public class Transformer implements ClassFileTransformer {
         } catch (NotFoundException | IOException ex) {
           System.out.println("Exception " + ex.getMessage());
           ex.printStackTrace();
-          return byteCode;
+          return classfileBuffer;
         }
 
         CtMethod[] methods = ctClass.getDeclaredMethods();
         for (CtMethod method : methods) {
 
-          // TODO: is there a problem with Abstract Classes?
+          // TODO: is there a problem with Abstract Classes? Enums?
           if (Modifier.isAbstract(method.getModifiers()) | Modifier.isEnum(method.getModifiers()) | Modifier
               .isInterface(
               method.getModifiers())) {
-            //            System.out.println("abstract class " + method.getLongName());
-            return byteCode;
+            return classfileBuffer;
           }
 
           try {
@@ -93,10 +92,6 @@ public class Transformer implements ClassFileTransformer {
             if (Monitor.conf.getAsBoolean(Monitor.WHEREAMI)) {
               code += whereAmI(method.getLongName());
             }
-
-            //            System.err.println("class " + className + " method " + method.getLongName() + "mods " +
-            // Modifier.toString(
-            //                method.getModifiers()));
             code += " cottagecoders_monitor_start = System.nanoTime(); }";
             method.insertBefore(code);
 
@@ -104,12 +99,12 @@ public class Transformer implements ClassFileTransformer {
             method.insertAfter(code);
 
             // initialize it and add to the data store (a Map, for now).
-            //            MetricPool.instance().add(method.getLongName(), 0L);
             MetricPool.add(method.getLongName(), 0L);
 
           } catch (CannotCompileException ex) {
             System.out.println("Exception " + ex.getMessage());
             ex.printStackTrace();
+            return classfileBuffer;
           }
         }
 
@@ -118,6 +113,7 @@ public class Transformer implements ClassFileTransformer {
         } catch (IOException | CannotCompileException ex) {
           System.out.println("Exception " + ex.getMessage());
           ex.printStackTrace();
+          return classfileBuffer;   // byteCode must be mangled.
         }
         ctClass.detach();
         // break inner for loop - classname matched - dont check any more.

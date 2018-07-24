@@ -42,13 +42,13 @@ httpPort=22277
 * `mvn clean package`
 * `cd target`
 * run Victim from within the target subdirectory specify Monitor as a Java Agent.
-* `java -javaagent:../../Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar Victim-1.0-SNAPSHOT-jar-with-dependencies.jar`
+* `java -javaagent:<PATH>/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar Victim-1.0-SNAPSHOT-jar-with-dependencies.jar`
 
 To run the program with Webgoat - follow the above steps then... 
 * `cd bobtest`
 * download Webgoat - i downloaded the jar from here: [https://github.com/WebGoat/WebGoat/releases]  you may have to copy it over from Downloads directory to the bobtest directory.
 * run WebGoat and redirect output to review later:
-* When WebGoat is in this directory run `java -javaagent:./Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar webgoat-server-8.0.0.M21.jar >x 2>x2` nb.  I redirect stdout, stderr to 'x' and 'x2' to review them later. 
+* When WebGoat is in this directory run `java -XX:+PrintGCDetails -verbose:gc -Xms10g -Xmx10g -javaagent:<PATH>/Monitor/target/Monitor-1.0-SNAPSHOT-jar-with-dependencies.jar -jar webgoat-server-8.0.0.M21.jar >x 2>x2` nb.  I redirect stdout, stderr to 'x' and 'x2' to review them later. 
 ## **Todo**
 plenty of things.
 - [ ] JavaDocs
