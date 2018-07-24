@@ -8,15 +8,14 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
   private Nanos elapsedNanos;
   private long numHits;
   private UUID uuid;
-  private ClassCounter classCounter;
+  private Counts counts;
 
-  public MethodMetrics(String name, long elapsed) {
+  public MethodMetrics(String name, long elapsed, Counts c) {
     this.methodName = name;
     elapsedNanos = new Nanos(elapsed);
     numHits = 0;
-    classCounter = new ClassCounter();
-    classCounter.updateClassCounts();
     uuid = UUID.randomUUID();
+    counts = c;
   }
 
   private MethodMetrics() {
@@ -37,7 +36,7 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
     sb.append(numHits);
 
     sb.append(" classCounter Info: ");
-    sb.append(classCounter.toString());
+    sb.append(counts.toString());
 
     sb.append(" UUID: ");
     sb.append(uuid);
@@ -59,7 +58,7 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
     sb.append(numHits);
     sb.append("</td>");
 
-    sb.append(classCounter.htmlTdElements());
+    sb.append(counts.htmlTdElements());
 
     sb.append("<td>");
     sb.append(uuid);
@@ -77,6 +76,10 @@ public class MethodMetrics implements Comparable<MethodMetrics> {
     } else {
       return -1;
     }
+  }
+
+  public void setCounts(Counts c) {
+    counts = c;
   }
 
   public String getMethodName() {

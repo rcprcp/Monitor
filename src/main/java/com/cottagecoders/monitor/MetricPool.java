@@ -11,19 +11,19 @@ public final class MetricPool {
     // can't instantiate.
   }
 
-  public static MetricPool instance() {
-    return metricPool;
-  }
+//  public static MetricPool instance() {
+//    return metricPool;
+//  }
 
-  public void add(String name, long elapsed) {
+  public static void add(String name, long elapsed) {
     if (theMetrics.containsKey(name)) {
-//      System.out.println("MetricPool(): adding " + name + " pool size " + theMetrics.size());
+//      System.out.println("MetricPool(): duplicate  " + name + " pool size " + theMetrics.size());
       MethodMetrics m = theMetrics.get(name);
       m.addElapsedNanos(elapsed);
       m.incrementNumHits();
       theMetrics.put(name, m);
     } else {
-      MethodMetrics metric = new MethodMetrics(name, elapsed);
+      MethodMetrics metric = new MethodMetrics(name, elapsed, new ClassCounter().getClassCounts());
       theMetrics.put(name, metric);
     }
   }
@@ -51,7 +51,7 @@ public final class MetricPool {
     return sb.toString();
   }
 
-  public static int count(){
+  public static int size(){
     return theMetrics.size();
   }
 

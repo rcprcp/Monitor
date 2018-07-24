@@ -19,10 +19,6 @@ public class ClassCounter {
   static ObjectName objName;
   static MBeanAttributeInfo[] arr;
 
-  private long totalLoadedClassCount;
-  private int loadedClassCount;
-  private long unloadedClassCount;
-
   ClassCounter() {
     server = ManagementFactory.getPlatformMBeanServer();
     try {
@@ -30,7 +26,6 @@ public class ClassCounter {
     } catch (MalformedObjectNameException ex) {
       ex.printStackTrace();
     }
-    //   server.queryNames(objName, null)
     try {
       info = server.getMBeanInfo(objName);
       arr = info.getAttributes();
@@ -39,7 +34,11 @@ public class ClassCounter {
     }
   }
 
-  public void updateClassCounts() {
+  public Counts getClassCounts() {
+
+    long totalLoadedClassCount = 0;
+    int loadedClassCount = 0;
+    long unloadedClassCount = 0;
 
     try {
       for (MBeanAttributeInfo a : arr) {
@@ -57,47 +56,8 @@ public class ClassCounter {
       System.out.println("Exception: " + ex.getMessage());
       ex.printStackTrace();
     }
+    return new Counts(totalLoadedClassCount, loadedClassCount, unloadedClassCount);
   }
 
-  public long getTotalLoadedClassCount() {
-    return totalLoadedClassCount;
-  }
-
-  public int getLoadedClassCount() {
-    return loadedClassCount;
-  }
-
-  public long getUnloadedClassCount() {
-    return unloadedClassCount;
-  }
-
-  public String htmlTdElements() {
-    StringBuilder sb = new StringBuilder();
-
-    sb.append("<td>");
-    sb.append(totalLoadedClassCount);
-    sb.append("</td>");
-
-    sb.append("<td>");
-    sb.append(loadedClassCount);
-    sb.append("</td>");
-
-    sb.append("<td>");
-    sb.append(unloadedClassCount);
-    sb.append("</td>");
-
-    return sb.toString();
-  }
-
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(" TotalLoadedClassCount: ");
-    sb.append(totalLoadedClassCount);
-    sb.append(" LoadedClassCount: ");
-    sb.append(loadedClassCount);
-    sb.append(" UnloadedClassCount: ");
-    sb.append(unloadedClassCount);
-    return sb.toString();
-  }
 
 }
