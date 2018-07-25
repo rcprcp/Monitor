@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -55,7 +56,7 @@ public class Transformer implements ClassFileTransformer {
       ProtectionDomain protectionDomain,
       byte[] classfileBuffer
   ) {
-    byte[] byteCode = classfileBuffer;
+    byte[] byteCode = Arrays.copyOf(classfileBuffer, classfileBuffer.length);
 
 
     // check if this is a class we should instrument...
