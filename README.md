@@ -65,7 +65,7 @@ plenty of things.
 - [x] Collect information on number of classes loaded.
 - [ ] Add some CSS to the html.   :smile: 
 - [ ] More HTML pages - for additional metrics.
-- [ ] Can we use a templating engine wfor out HTML?
+- [ ] Can we use a templating engine for HTML?
 - [ ] Add sort(s) the the Metrics table (name, elapsed time, hits)
 - [ ] Need to identify how to walk the heap to find and "bucketize" objects for counting and size monitoring. 
 - [ ] Need to intercept inbound and outbound socket data.  
