@@ -12,7 +12,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import java.lang.management.ManagementFactory;
 
-public class ClassCounter {
+final class ClassCounter {
 
   static MBeanServer server;
   static MBeanInfo info;

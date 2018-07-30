@@ -1,6 +1,6 @@
 package com.cottagecoders.monitor;
 
-public class Counts {
+final class Counts {
   private long totalLoadedClassCount;
   private int loadedClassCount;
   private long unloadedClassCount;

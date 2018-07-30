@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 
 //this class will be registered with instrumentation agent
-public class Transformer implements ClassFileTransformer {
+final class Transformer implements ClassFileTransformer {
   //  static final Logger LOG = LoggerFactory.getLogger(Transformer.class);
 
   private static final String[] classesToInstrument = Monitor.conf.getAsArray("includeList");
@@ -68,7 +68,7 @@ public class Transformer implements ClassFileTransformer {
         try {
           classPool.insertClassPath(new LoaderClassPath(loader));
           ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-        } catch (/*NotFoundException | */  IOException ex) {
+        } catch (IOException ex) {
           System.out.println("Exception " + ex.getMessage());
           ex.printStackTrace();
           return classfileBuffer;
@@ -78,8 +78,7 @@ public class Transformer implements ClassFileTransformer {
         for (CtMethod method : methods) {
 
           // TODO: is there a problem with Abstract Classes? Enums?
-          if (Modifier.isAbstract(method.getModifiers()) | Modifier.isEnum(method.getModifiers()) | Modifier
-              .isInterface(
+          if (Modifier.isAbstract(method.getModifiers()) | Modifier.isEnum(method.getModifiers()) | Modifier.isInterface(
               method.getModifiers())) {
             return classfileBuffer;
           }
@@ -96,7 +95,7 @@ public class Transformer implements ClassFileTransformer {
             code = after(method.getLongName());
             method.insertAfter(code);
 
-            // initialize it and add to the data store (a Map, for now).
+            // initialize it and add to the data store.
             MetricPool.add(method.getLongName(), 0L);
 
           } catch (CannotCompileException ex) {
@@ -114,7 +113,7 @@ public class Transformer implements ClassFileTransformer {
           return classfileBuffer;   // byteCode must be mangled.
         }
         ctClass.detach();
-        // break inner for loop - classname matched - dont check any more.
+        // classname matched - don't check any more.
         break;
       }
     }

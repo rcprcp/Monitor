@@ -3,7 +3,7 @@ package com.cottagecoders.monitor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class MetricPool {
+final class MetricPool {
   private static final Map<String, MethodMetrics> theMetrics = new ConcurrentHashMap<>(11000);
 
   private MetricPool() {
@@ -16,7 +16,6 @@ public final class MetricPool {
       MethodMetrics m = theMetrics.get(name);
       m.addElapsedNanos(elapsed);
       m.incrementNumHits();
-      //      theMetrics.put(name, m);
     } else {
       MethodMetrics metric = new MethodMetrics(name, elapsed, new ClassCounter().getClassCounts());
       theMetrics.put(name, metric);

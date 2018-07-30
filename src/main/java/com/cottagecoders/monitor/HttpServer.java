@@ -7,7 +7,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 
-public class HttpServer extends NanoHTTPD implements Runnable {
+final class HttpServer extends NanoHTTPD implements Runnable {
   int port;
   String hostName;
 

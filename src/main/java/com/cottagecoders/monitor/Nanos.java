@@ -1,6 +1,6 @@
 package com.cottagecoders.monitor;
 
-class Nanos {
+final class Nanos {
   long time;
 
   private Nanos() {

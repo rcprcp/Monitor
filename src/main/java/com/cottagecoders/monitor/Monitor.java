@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 
-public class Monitor {
+final class Monitor {
   static final String MONITOR_PROPERTIES = "MONITOR_PROPERTIES";
   static final String WHEREAMI = "whereAmI";
   static final String INCLUDE_LIST = "includeList";

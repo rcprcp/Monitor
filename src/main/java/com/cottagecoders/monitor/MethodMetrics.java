@@ -2,7 +2,7 @@ package com.cottagecoders.monitor;
 
 import java.util.UUID;
 
-public class MethodMetrics implements Comparable<MethodMetrics> {
+final class MethodMetrics implements Comparable<MethodMetrics> {
   private String methodName;
   private String attributes;
   private Nanos elapsedNanos;

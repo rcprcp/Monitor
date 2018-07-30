@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
-public class Config {
+final class Config {
   Properties props;
 
   public Config(String fileName) throws IllegalArgumentException, IOException {
