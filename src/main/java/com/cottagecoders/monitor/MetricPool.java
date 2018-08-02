@@ -3,7 +3,7 @@ package com.cottagecoders.monitor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-final class MetricPool {
+public final class MetricPool {
   private static final Map<String, MethodMetrics> theMetrics = new ConcurrentHashMap<>(11000);
 
   private MetricPool() {
