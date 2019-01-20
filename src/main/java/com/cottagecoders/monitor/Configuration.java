@@ -13,8 +13,8 @@ final class Configuration {
   static final String INCLUDE_LIST = "includeList";
   static final String EXCLUDE_LIST = "excludeList";
   static final String APPNAME = "appname";
-  static final String DBWRITER_HOSTNAME = "dbwriterHostname";
-  static final String DBWRITER_PORT = "dbwriterPort";
+  static final String DBWRITER_HOSTNAME = "dbWriterHostname";
+  static final String DBWRITER_PORT = "dbWriterPort";
 
   Properties props;
 

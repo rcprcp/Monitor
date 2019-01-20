@@ -39,11 +39,11 @@ To use the systems there are 4 parts which are required:
 * create a monitor.properties file with the following lines:
 
 ```
-whereAmi=true
-includeList=com/cottagecoders/victim/Vi.*,com/streamsets.*
+whereAmI=true
+includeList=com/cottagecoders/victim.*,com/streamsets.*
 appname=myapp
-destinationHostname=localhost
-destinationPort=1234
+dbWriterHostname=localhost
+dbWriterPort=1128
 ```
 * Set the environment variable Monitor uses to point to the properties file: `export MONITOR_PROPERTIES=~/monitor.properties`
 * Create a directory which will contain MonitorServer, Monitor and Victim, for example `mkdir bobtest`

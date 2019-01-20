@@ -24,12 +24,11 @@ final class Monitor {
    * @param inst -- Instrumentation object.
    */
   public static void premain(String args, Instrumentation inst) {
-
+System.out.println("PREMAIN GOT HERE");
     // get host name - if that fails, try for the ip address.
-    // TODO: duplicated code - also in the server.
     try {
       hostName = InetAddress.getLocalHost().getHostName();
-    } catch(UnknownHostException ex) {
+    } catch (UnknownHostException ex) {
       try {
         hostName = InetAddress.getLocalHost().getHostAddress();
       } catch (UnknownHostException e) {
@@ -51,8 +50,11 @@ final class Monitor {
       conf = new Configuration(fileName);
     } catch (IOException ex) {
       System.out.println("Can't load config file " + System.getenv(Configuration.MONITOR_PROPERTIES) + " message " + ex.getMessage());
+      System.exit(27);
     }
 
+    // TODO: delete me.
+    System.out.println("after config file " + conf.toString());
     // destination should not be blank - can use "localhost"
     if (StringUtils.isEmpty(conf.getAsString(Configuration.DBWRITER_HOSTNAME))) {
       System.out.println("Destination Hostname cannot be blank");
@@ -66,7 +68,8 @@ final class Monitor {
     }
 
     // create publisher object to send to monitor_server.
-    // under the hood this might be a socket or TODO: someday we'll need a queue.
+    // under the hood this might be a socket or...
+    // TODO: someday we'll need a queue.
     try {
       publisher = new Publisher(conf.getAsString(Configuration.DBWRITER_HOSTNAME),
           conf.getAsInt(Configuration.DBWRITER_PORT)
@@ -81,7 +84,7 @@ final class Monitor {
     PREFIX = Configuration.APPNAME + DELIM + START_TIME;
 
     // send appname + startime record.
-    publisher.send("start" + DELIM + PREFIX + DELIM  + hostName);
+    publisher.send("start" + DELIM + PREFIX + DELIM + hostName);
 
     // send the configuration information for this run.
     publisher.send("configfile" + DELIM + PREFIX + DELIM + Configuration.MONITOR_PROPERTIES + DELIM + System.getenv(
@@ -89,9 +92,8 @@ final class Monitor {
 
     Set<String> names = conf.props.stringPropertyNames();
     for (String n : names) {
-      publisher.send("configitem"  + DELIM + PREFIX + DELIM + n + DELIM + conf.getAsString(n));
+      publisher.send("configitem" + DELIM + PREFIX + DELIM + n + DELIM + conf.getAsString(n));
     }
-
 
     Transformer transformer = new Transformer();
     transformer.init();
