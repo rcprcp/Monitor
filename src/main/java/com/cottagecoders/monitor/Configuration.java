@@ -7,10 +7,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
-final class Config {
+final class Configuration {
+  static final String MONITOR_PROPERTIES = "MONITOR_PROPERTIES";
+  static final String WHEREAMI = "whereAmI";
+  static final String INCLUDE_LIST = "includeList";
+  static final String EXCLUDE_LIST = "excludeList";
+  static final String APPNAME = "appname";
+  static final String DBWRITER_HOSTNAME = "dbwriterHostname";
+  static final String DBWRITER_PORT = "dbwriterPort";
+
   Properties props;
 
-  public Config(String fileName) throws IllegalArgumentException, IOException {
+  public Configuration(String fileName) throws IllegalArgumentException, IOException {
 
     if (StringUtils.isEmpty(fileName)) {
       System.out.println("failed to get value of configuration fileName");
@@ -27,7 +35,7 @@ final class Config {
     }
   }
 
-  public String getString(String propName) {
+  public String getAsString(String propName) {
     if (StringUtils.isEmpty(props.getProperty(propName))) {
       return "";
     }
@@ -40,7 +48,7 @@ final class Config {
       try {
         num = Integer.parseInt(props.getProperty(propName));
       } catch (NumberFormatException ex) {
-        System.out.print("Config: invalid value for property " + propName + " value " + props.getProperty(propName));
+        System.out.print("Configuration: invalid value for property " + propName + " value " + props.getProperty(propName));
       }
     }
     return num;
@@ -55,7 +63,7 @@ final class Config {
   }
 
   public boolean getAsBoolean(String propName) {
-    if (getString(propName).equalsIgnoreCase("true")) {
+    if (getAsString(propName).equalsIgnoreCase("true")) {
       return true;
     }
     return false;
@@ -64,7 +72,7 @@ final class Config {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     for (String k : props.stringPropertyNames()) {
-      sb.append("Config() key: ");
+      sb.append("Configuration() key: ");
       sb.append(k);
       sb.append("  value: ");
       sb.append(props.getProperty(k));
@@ -76,7 +84,7 @@ final class Config {
   public String toHtml() {
     StringBuilder sb = new StringBuilder();
     for (String k : props.stringPropertyNames()) {
-      sb.append("<br>Config() key: ");
+      sb.append("<br>Configuration() key: ");
       sb.append(k);
       sb.append("  value: ");
       sb.append(props.getProperty(k));

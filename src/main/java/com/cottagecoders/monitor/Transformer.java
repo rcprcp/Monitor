@@ -6,7 +6,6 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.LoaderClassPath;
 import javassist.Modifier;
-import javassist.NotFoundException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -22,9 +21,11 @@ import java.util.regex.Pattern;
 final class Transformer implements ClassFileTransformer {
   //  static final Logger LOG = LoggerFactory.getLogger(Transformer.class);
 
-  private static final String[] classesToInstrument = Monitor.conf.getAsArray("includeList");
+  private static final String[] classesToInstrument = Monitor.conf.getAsArray(Configuration.INCLUDE_LIST);
+  private static final String[] classesToSkip = Monitor.conf.getAsArray(Configuration.EXCLUDE_LIST);
 
   private static List<Pattern> patterns = new ArrayList<>();
+  private static List<Pattern> patternsToSkip = new ArrayList<>();
 
   /**
    * initialize the transformer code, particularly the regex processing.
@@ -39,6 +40,11 @@ final class Transformer implements ClassFileTransformer {
       Pattern pattern = Pattern.compile(cl);
       patterns.add(pattern);
     }
+
+    for (String cl : classesToSkip) {
+      Pattern pattern = Pattern.compile(cl);
+      patternsToSkip.add(pattern);
+    }
   }
 
   /**
@@ -50,7 +56,7 @@ final class Transformer implements ClassFileTransformer {
    * @return Original byte code - or the modified byte code
    */
 
-  
+
   public byte[] transform(
       ClassLoader loader,
       String className,
@@ -60,6 +66,12 @@ final class Transformer implements ClassFileTransformer {
   ) {
     byte[] byteCode = Arrays.copyOf(classfileBuffer, classfileBuffer.length);
 
+    // check if this is a class we should skip.
+    for (Pattern p : patternsToSkip) {
+      if (p.matcher(className).matches()) {
+        return classfileBuffer;
+      }
+    }
 
     // check if this is a class we should instrument...
     for (Pattern p : patterns) {
@@ -87,18 +99,12 @@ final class Transformer implements ClassFileTransformer {
 
           try {
             method.addLocalVariable("cottagecoders_monitor_start", CtClass.longType);
-            String code = "{";
-            if (Monitor.conf.getAsBoolean(Monitor.WHEREAMI)) {
-              code += whereAmI(method.getLongName());
-            }
-            code += " cottagecoders_monitor_start = System.nanoTime(); }";
+            method.addLocalVariable("cottagecoders_monitor_starting_sequence", CtClass.longType);
+            String code = before(method.getLongName());
             method.insertBefore(code);
 
             code = after(method.getLongName());
             method.insertAfter(code);
-
-            // initialize it and add to the data store.
-            MetricPool.add(method.getLongName(), 0L);
 
           } catch (CannotCompileException ex) {
             System.out.println("Exception " + ex.getMessage());
@@ -115,6 +121,7 @@ final class Transformer implements ClassFileTransformer {
           return classfileBuffer;   // byteCode must be mangled.
         }
         ctClass.detach();
+
         // classname matched - don't check any more.
         break;
       }
@@ -126,19 +133,23 @@ final class Transformer implements ClassFileTransformer {
     return "System.out.println(\"whereAmI?  got here: " + name + "\");";
   }
 
-  String after(String name) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("{ ");
-    sb.append("com.cottagecoders.monitor.MetricPool.add(\"");
-    sb.append(name);
-    sb.append("\", System.nanoTime() - cottagecoders_monitor_start); }");
+  String before(String name) {
+    StringBuilder sb = new StringBuilder(200);
+    sb.append("{");
+    if (Monitor.conf.getAsBoolean(Configuration.WHEREAMI)) {
+      sb.append(whereAmI(name));
+    }
+    sb.append(" cottagecoders_monitor_start = System.nanoTime(); " +
+  "cottagecoders_monitor_starting_sequence = com.cottagecoders.monitor.Metrics.incrementSequence(); }");
     return sb.toString();
   }
 
-  String OLDafter(String name) {
-    StringBuilder sb = new StringBuilder();
+  String after(String name) {
+    StringBuilder sb = new StringBuilder(200);
     sb.append("{ ");
-    sb.append("System.nanoTime() - cottagecoders_monitor_start; }");
+    sb.append("com.cottagecoders.monitor.Metrics.sendMetrics(\"");
+    sb.append(name);
+    sb.append("\", cottagecoders_monitor_starting_sequence, System.nanoTime() - cottagecoders_monitor_start); }");
     return sb.toString();
   }
 }

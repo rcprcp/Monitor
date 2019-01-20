@@ -4,50 +4,100 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Set;
 
 final class Monitor {
-  static final String MONITOR_PROPERTIES = "MONITOR_PROPERTIES";
-  static final String WHEREAMI = "whereAmI";
-  static final String INCLUDE_LIST = "includeList";
-  static final String HTTP_PORT = "httpPort";
-  static final int DEFAULT_PORT = 1128;
-  public static Config conf;
+  public static final long START_TIME = System.currentTimeMillis();
+  public static String hostName;
+  public static final String DELIM = "\t";
+  public static Publisher publisher;
+  public static String PREFIX;
 
+  static Configuration conf;
   private static Instrumentation instrumentation;
 
   /**
-   * @param args any args after the javaagent jar and the =
-   * @param inst
+   * @param args -- there are no args - currently everything is in the config file
+   * which is pointed to by the environment variable (MONITOR_PROPERTIES)
+   * @param inst -- Instrumentation object.
    */
   public static void premain(String args, Instrumentation inst) {
-    String fileName = System.getenv(MONITOR_PROPERTIES);
+
+    // get host name - if that fails, try for the ip address.
+    // TODO: duplicated code - also in the server.
+    try {
+      hostName = InetAddress.getLocalHost().getHostName();
+    } catch(UnknownHostException ex) {
+      try {
+        hostName = InetAddress.getLocalHost().getHostAddress();
+      } catch (UnknownHostException e) {
+        System.out.println("cannot get hostname or ipaddress.");
+        System.exit(4);
+      }
+    }
+
+    // check environment variable for name of the configuration file.
+    String fileName = System.getenv(Configuration.MONITOR_PROPERTIES);
     if (StringUtils.isEmpty(fileName)) {
       // important enough to go to both console and log.
-      System.out.println("invalid value set for " + MONITOR_PROPERTIES);
+      System.out.println("invalid value set for " + Configuration.MONITOR_PROPERTIES);
       System.exit(27);
     }
+
+    // read configuration file - create configuration object .
     try {
-      conf = new Config(fileName);
+      conf = new Configuration(fileName);
     } catch (IOException ex) {
-      System.out.println("Can't load config file " + System.getenv("MONITOR_PROPERTIES") + " message " + ex
-          .getMessage());
+      System.out.println("Can't load config file " + System.getenv(Configuration.MONITOR_PROPERTIES) + " message " + ex.getMessage());
     }
+
+    // destination should not be blank - can use "localhost"
+    if (StringUtils.isEmpty(conf.getAsString(Configuration.DBWRITER_HOSTNAME))) {
+      System.out.println("Destination Hostname cannot be blank");
+      System.exit(27);
+    }
+
+    // check if the port is in the non-privileged port range:
+    if (conf.getAsInt(Configuration.DBWRITER_PORT) < 1025 || conf.getAsInt(Configuration.DBWRITER_PORT) > 65536) {
+      System.out.println("Invalid destination port " + conf.getAsInt(Configuration.DBWRITER_PORT));
+      System.exit(27);
+    }
+
+    // create publisher object to send to monitor_server.
+    // under the hood this might be a socket or TODO: someday we'll need a queue.
+    try {
+      publisher = new Publisher(conf.getAsString(Configuration.DBWRITER_HOSTNAME),
+          conf.getAsInt(Configuration.DBWRITER_PORT)
+      );
+    } catch (IOException ex) {
+      System.out.println("cannot connect to remote server " + ex.getMessage());
+      ex.printStackTrace();
+      System.exit(27);
+    }
+
+    // create record prefix:
+    PREFIX = Configuration.APPNAME + DELIM + START_TIME;
+
+    // send appname + startime record.
+    publisher.send("start" + DELIM + PREFIX + DELIM  + hostName);
+
+    // send the configuration information for this run.
+    publisher.send("configfile" + DELIM + PREFIX + DELIM + Configuration.MONITOR_PROPERTIES + DELIM + System.getenv(
+        Configuration.MONITOR_PROPERTIES));
+
+    Set<String> names = conf.props.stringPropertyNames();
+    for (String n : names) {
+      publisher.send("configitem"  + DELIM + PREFIX + DELIM + n + DELIM + conf.getAsString(n));
+    }
+
 
     Transformer transformer = new Transformer();
     transformer.init();
 
+    // register our callback function to the Instrumentation object.
     inst.addTransformer(transformer);
-
-    // find port; start a thread for NanoHttpd server
-    int port = Monitor.conf.getAsInt(Monitor.HTTP_PORT);
-    final int LOW_PORT_NUM = 1024;
-    final int HIGH_PORT_NUM = 65536;
-    if (port <= LOW_PORT_NUM || port >= HIGH_PORT_NUM) {
-      System.out.println("Invalid port number: " + port + " using default " + DEFAULT_PORT);
-      port = DEFAULT_PORT;
-    }
-    (new Thread(new HttpServer(port))).start();
-
   }
 
   /**
