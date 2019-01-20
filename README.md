@@ -35,7 +35,7 @@ To use the systems there are 4 parts which are required:
 * Deploy Monitor - this repo - which is the Java agent which runs with the program to be monitored. 
 * The last step is to find a suitable program to monitor - i currently use Victim [http://github.com/rcprcp/Victim.git] - it's very easy to work with.
 
-## To deply Monitor follow these instructions. 
+## To deploy Monitor follow these instructions. 
 * create a monitor.properties file with the following lines:
 
 ```
