@@ -9,11 +9,11 @@ import java.net.UnknownHostException;
 import java.util.Set;
 
 final class Monitor {
-  public static final long START_TIME = System.currentTimeMillis();
-  public static String hostName;
-  public static final String DELIM = "\t";
-  public static Publisher publisher;
-  public static String PREFIX;
+  static final long START_TIME = System.currentTimeMillis();
+  static String hostName;
+  static final String DELIM = "\t";
+  static Publisher publisher;
+  static String PREFIX;
 
   static Configuration conf;
   private static Instrumentation instrumentation;
@@ -98,7 +98,7 @@ System.out.println("PREMAIN GOT HERE");
     Transformer transformer = new Transformer();
     transformer.init();
 
-    // register our callback function to the Instrumentation object.
+    // register callback function
     inst.addTransformer(transformer);
   }
 

@@ -35,14 +35,14 @@ final class Configuration {
     }
   }
 
-  public String getAsString(String propName) {
+  String getAsString(String propName) {
     if (StringUtils.isEmpty(props.getProperty(propName))) {
       return "";
     }
     return props.getProperty(propName);
   }
 
-  public int getAsInt(String propName) {
+  int getAsInt(String propName) {
     int num = 0;
     if (!StringUtils.isEmpty(props.getProperty(propName))) {
       try {
@@ -54,7 +54,7 @@ final class Configuration {
     return num;
   }
 
-  public String[] getAsArray(String propName) {
+  String[] getAsArray(String propName) {
     if (StringUtils.isEmpty(props.getProperty(propName))) {
       return new String[0];
     }
@@ -80,16 +80,4 @@ final class Configuration {
     }
     return sb.toString();
   }
-
-  public String toHtml() {
-    StringBuilder sb = new StringBuilder();
-    for (String k : props.stringPropertyNames()) {
-      sb.append("<br>Configuration() key: ");
-      sb.append(k);
-      sb.append("  value: ");
-      sb.append(props.getProperty(k));
-    }
-    return sb.toString();
-  }
-
 }

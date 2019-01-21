@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 //this class will be registered with instrumentation agent
 final class Transformer implements ClassFileTransformer {
-  //  static final Logger LOG = LoggerFactory.getLogger(Transformer.class);
+  // static final Logger LOG = LoggerFactory.getLogger(Transformer.class);
 
   private static final String[] classesToInstrument = Monitor.conf.getAsArray(Configuration.INCLUDE_LIST);
   private static final String[] classesToSkip = Monitor.conf.getAsArray(Configuration.EXCLUDE_LIST);
@@ -27,9 +27,6 @@ final class Transformer implements ClassFileTransformer {
   private static List<Pattern> patterns = new ArrayList<>();
   private static List<Pattern> patternsToSkip = new ArrayList<>();
 
-  /**
-   * initialize the transformer code, particularly the regex processing.
-   */
   public void init() {
     // nothing specified in include list.
     if (classesToInstrument.length == 0) {
@@ -47,7 +44,7 @@ final class Transformer implements ClassFileTransformer {
     }
   }
 
-  /**
+  /**  Important to note:
    * @param loader
    * @param className
    * @param classBeingRedefined
@@ -55,8 +52,6 @@ final class Transformer implements ClassFileTransformer {
    * @param classfileBuffer
    * @return Original byte code - or the modified byte code
    */
-
-
   public byte[] transform(
       ClassLoader loader,
       String className,
@@ -64,14 +59,15 @@ final class Transformer implements ClassFileTransformer {
       ProtectionDomain protectionDomain,
       byte[] classfileBuffer
   ) {
-    byte[] byteCode = Arrays.copyOf(classfileBuffer, classfileBuffer.length);
-
-    // check if this is a class we should skip.
+       // check if this is a class we should skip.
     for (Pattern p : patternsToSkip) {
       if (p.matcher(className).matches()) {
         return classfileBuffer;
       }
     }
+
+    // deep copy to return in case something goes wrong.
+    byte[] byteCode = Arrays.copyOf(classfileBuffer, classfileBuffer.length);
 
     // check if this is a class we should instrument...
     for (Pattern p : patterns) {
@@ -118,23 +114,20 @@ final class Transformer implements ClassFileTransformer {
         } catch (IOException | CannotCompileException ex) {
           System.out.println("Exception " + ex.getMessage());
           ex.printStackTrace();
-          return classfileBuffer;   // byteCode must be mangled.
+          return classfileBuffer;   // byteCode must be mangled.  :(
         }
         ctClass.detach();
 
-        // classname matched - don't check any more.
+        // classname matched - don't check this one any more.
         break;
       }
     }
     return byteCode;
   }
 
-  String whereAmI(String name) {
-    return "System.out.println(\"whereAmI?  got here: " + name + "\");";
-  }
-
   String before(String name) {
     StringBuilder sb = new StringBuilder(200);
+    // start a new block.
     sb.append("{");
     if (Monitor.conf.getAsBoolean(Configuration.WHEREAMI)) {
       sb.append(whereAmI(name));
@@ -142,6 +135,10 @@ final class Transformer implements ClassFileTransformer {
     sb.append(" cottagecoders_monitor_start = System.nanoTime(); " +
   "cottagecoders_monitor_starting_sequence = com.cottagecoders.monitor.Metrics.incrementSequence(); }");
     return sb.toString();
+  }
+
+  String whereAmI(String name) {
+    return "System.out.println(\"whereAmI?  got here: " + name + "\");";
   }
 
   String after(String name) {
